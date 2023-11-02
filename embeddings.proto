@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package embeddings;
+
+message EmbeddingRequest {
+  string sentence = 1;
+}
+
+message EmbeddingResponse {
+  repeated float embedding = 1;
+}
+
+service Embeddings {
+  rpc GetEmbedding(EmbeddingRequest) returns (EmbeddingResponse) {}
+}
