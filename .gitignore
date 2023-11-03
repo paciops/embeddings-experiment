@@ -2,3 +2,4 @@ node_modules/
 __pycache__
 embeddings*.ts
 embeddings*.py
+vectorDB/workspace/*/
