@@ -1,4 +1,5 @@
 import { credentials } from "@grpc/grpc-js";
+import { qdrant, vectorDB } from "./databases";
 import { orama } from "./databases/orama";
 import {
   EmbeddingsClient,
@@ -25,8 +26,19 @@ const createRPC = (address: string) => {
   };
 };
 
+const createDB = async (type?: string) => {
+  switch (type) {
+    case "vectorDB":
+      return await vectorDB(768, "http://127.0.0.1:12345");
+    case "qdrant":
+      return await qdrant(768, "http://127.0.0.1:6333");
+    default:
+      return await orama(768);
+  }
+};
+
 (async () => {
-  const db = await orama(768),
+  const db = await createDB(process.env.DB),
     client = createRPC(address);
 
   for (const sentence of ["ciao mondo", "ciaoo bella"]) {
@@ -34,6 +46,7 @@ const createRPC = (address: string) => {
     const result = await db.add(sentence, response.embedding);
     console.log("added " + sentence + " ", result);
   }
-  const { embedding } = await client.getEmbeddings("ciao mondo");
-  console.table(await db.search(embedding));
+  const sentence = "ciao cari",
+    { embedding } = await client.getEmbeddings(sentence);
+  console.log(await db.search(sentence, embedding));
 })();
